@@ -7,10 +7,16 @@ comark: true
 ---
 
 # Things you can do with Spring Boot and Kotlin
+
 A guided Tour
 
 ---
-# Kotlin loved Spring
+
+<div class="flex justify-center items-center mt-20">
+  <img src="/assets/kotlin_logo.png" alt="Kotlin" class="h-20 mr-12" />
+  <img src="/assets/heart.png" alt="Love" class="h-20 mr-4" />
+  <img src="/assets/spring_logo.png" alt="Spring" class="h-56" />
+</div>
 
 ---
 
