@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @RestController
-@RequestMapping("/owners/{ownerId}/pets")
+@RequestMapping("/pets")
 @RequiredArgsConstructor
 public class PetController {
 
@@ -24,8 +24,8 @@ public class PetController {
     private final PetMapper petMapper;
 
     @GetMapping
-    public List<PetResponse> getByOwnerId(@PathVariable Long ownerId) {
-        return petService.findByOwnerId(ownerId).stream()
+    public List<PetResponse> getAll() {
+        return petService.findAll().stream()
                 .map(petMapper::toPetResponse)
                 .toList();
     }
@@ -40,8 +40,8 @@ public class PetController {
     }
 
     @PostMapping
-    public ResponseEntity<PetResponse> create(@PathVariable Long ownerId, @Valid @RequestBody PetRequest request) {
-        final var owner = new Owner(ownerId, null, null, null, null, null, new HashSet<>());
+    public ResponseEntity<PetResponse> create(@Valid @RequestBody PetRequest request) {
+        final var owner = new Owner(request.ownerId(), null, null, null, null, null, new HashSet<>());
 
         final var entity = petMapper.toPet(request);
         entity.setOwner(owner);
@@ -52,8 +52,8 @@ public class PetController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PetResponse> update(@PathVariable Long ownerId, @PathVariable Long id, @Valid @RequestBody PetRequest request) {
-        final var owner = new Owner(ownerId, null, null, null, null, null, new HashSet<>());
+    public ResponseEntity<PetResponse> update(@PathVariable Long id, @Valid @RequestBody PetRequest request) {
+        final var owner = new Owner(request.ownerId(), null, null, null, null, null, new HashSet<>());
 
         final var entity = petMapper.toPet(request);
         entity.setId(id);

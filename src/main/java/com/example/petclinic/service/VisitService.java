@@ -20,6 +20,14 @@ public class VisitService {
     private final PetRepository petRepository;
 
     @Transactional(readOnly = true)
+    public List<Visit> findAll() {
+        log.debug("Fetching all visits");
+        List<Visit> visits = visitRepository.findAll();
+        log.debug("Found {} visits", visits.size());
+        return visits;
+    }
+
+    @Transactional(readOnly = true)
     public List<Visit> findByPetId(Long petId) {
         log.debug("Fetching visits for pet id: {}", petId);
         final var pet = petRepository.findById(petId).orElse(null);

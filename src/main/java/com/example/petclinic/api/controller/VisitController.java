@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @RestController
-@RequestMapping("/owners/{ownerId}/pets/{petId}/visits")
+@RequestMapping("/visits")
 @RequiredArgsConstructor
 public class VisitController {
 
@@ -24,8 +24,8 @@ public class VisitController {
     private final VisitMapper visitMapper;
 
     @GetMapping
-    public List<VisitResponse> getByPetId(@PathVariable Long petId) {
-        return visitService.findByPetId(petId).stream()
+    public List<VisitResponse> getAll() {
+        return visitService.findAll().stream()
                 .map(visitMapper::toVisitResponse)
                 .toList();
     }
@@ -40,8 +40,8 @@ public class VisitController {
     }
 
     @PostMapping
-    public ResponseEntity<VisitResponse> create(@PathVariable Long petId, @Valid @RequestBody VisitRequest request) {
-        final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
+    public ResponseEntity<VisitResponse> create(@Valid @RequestBody VisitRequest request) {
+        final var pet = new Pet(request.petId(), null, null, null, null, new HashSet<>());
 
         final var entity = visitMapper.toVisit(request);
         entity.setPet(pet);
@@ -51,8 +51,8 @@ public class VisitController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VisitResponse> update(@PathVariable Long petId, @PathVariable Long id, @Valid @RequestBody VisitRequest request) {
-        final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
+    public ResponseEntity<VisitResponse> update(@PathVariable Long id, @Valid @RequestBody VisitRequest request) {
+        final var pet = new Pet(request.petId(), null, null, null, null, new HashSet<>());
 
         final var entity = visitMapper.toVisit(request);
         entity.setId(id);

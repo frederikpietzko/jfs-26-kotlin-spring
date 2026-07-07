@@ -56,12 +56,12 @@ class PetControllerTest {
         owner.setTelephone("123456789");
         owner = ownerRepository.save(owner);
 
-        petRequest = new PetRequest("Fluffy", PetTypeRequest.CAT);
+        petRequest = new PetRequest(owner.getId(), "Fluffy", PetTypeRequest.CAT);
     }
 
     @Test
     void shouldCreatePet() throws Exception {
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest)))
                 .andExpect(status().isCreated())
@@ -79,7 +79,7 @@ class PetControllerTest {
         pet.setOwner(owner);
         pet = petRepository.save(pet);
 
-        mockMvc.perform(get("/owners/{ownerId}/pets/{id}", owner.getId(), pet.getId()))
+        mockMvc.perform(get("/pets/{id}", pet.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Fluffy"))
                 .andExpect(jsonPath("$.type").value("CAT"));
@@ -87,12 +87,12 @@ class PetControllerTest {
 
     @Test
     void shouldReturnNotFoundForNonExistentPet() throws Exception {
-        mockMvc.perform(get("/owners/{ownerId}/pets/{id}", owner.getId(), 9999L))
+        mockMvc.perform(get("/pets/{id}", 9999L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void shouldGetPetsByOwnerId() throws Exception {
+    void shouldGetAllPets() throws Exception {
         Pet pet1 = new Pet();
         pet1.setName("Fluffy");
         pet1.setType(PetType.CAT);
@@ -105,7 +105,7 @@ class PetControllerTest {
         pet2.setOwner(owner);
         petRepository.save(pet2);
 
-        mockMvc.perform(get("/owners/{ownerId}/pets", owner.getId()))
+        mockMvc.perform(get("/pets"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value("Fluffy"))
@@ -113,8 +113,8 @@ class PetControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyListForOwnerWithNoPets() throws Exception {
-        mockMvc.perform(get("/owners/{ownerId}/pets", owner.getId()))
+    void shouldReturnEmptyListWhenNoPets() throws Exception {
+        mockMvc.perform(get("/pets"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -127,9 +127,9 @@ class PetControllerTest {
         pet.setOwner(owner);
         pet = petRepository.save(pet);
 
-        PetRequest updateRequest = new PetRequest("FluffyUpdated", PetTypeRequest.DOG);
+        PetRequest updateRequest = new PetRequest(owner.getId(), "FluffyUpdated", PetTypeRequest.DOG);
 
-        mockMvc.perform(put("/owners/{ownerId}/pets/{id}", owner.getId(), pet.getId())
+        mockMvc.perform(put("/pets/{id}", pet.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
@@ -139,9 +139,9 @@ class PetControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenUpdatingNonExistentPet() throws Exception {
-        PetRequest updateRequest = new PetRequest("Updated", PetTypeRequest.CAT);
+        PetRequest updateRequest = new PetRequest(owner.getId(), "Updated", PetTypeRequest.CAT);
 
-        mockMvc.perform(put("/owners/{ownerId}/pets/{id}", owner.getId(), 9999L)
+        mockMvc.perform(put("/pets/{id}", 9999L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isNotFound());
@@ -155,7 +155,7 @@ class PetControllerTest {
         pet.setOwner(owner);
         pet = petRepository.save(pet);
 
-        mockMvc.perform(delete("/owners/{ownerId}/pets/{id}", owner.getId(), pet.getId()))
+        mockMvc.perform(delete("/pets/{id}", pet.getId()))
                 .andExpect(status().isNoContent());
 
         assert petRepository.count() == 0;
@@ -163,9 +163,9 @@ class PetControllerTest {
 
     @Test
     void shouldValidateEmptyPetRequest() throws Exception {
-        PetRequest emptyRequest = new PetRequest(null, null);
+        PetRequest emptyRequest = new PetRequest(owner.getId(), null, null);
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(emptyRequest)))
                 .andExpect(status().isBadRequest());
@@ -175,9 +175,9 @@ class PetControllerTest {
 
     @Test
     void shouldValidatePetNameNotBlank() throws Exception {
-        PetRequest invalidRequest = new PetRequest("", PetTypeRequest.CAT);
+        PetRequest invalidRequest = new PetRequest(owner.getId(), "", PetTypeRequest.CAT);
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -187,26 +187,26 @@ class PetControllerTest {
 
     @Test
     void shouldHandleMultiplePetsForSameOwner() throws Exception {
-        PetRequest petRequest1 = new PetRequest("Fluffy", PetTypeRequest.CAT);
-        PetRequest petRequest2 = new PetRequest("Buddy", PetTypeRequest.DOG);
-        PetRequest petRequest3 = new PetRequest("Nemo", PetTypeRequest.FISH);
+        PetRequest petRequest1 = new PetRequest(owner.getId(), "Fluffy", PetTypeRequest.CAT);
+        PetRequest petRequest2 = new PetRequest(owner.getId(), "Buddy", PetTypeRequest.DOG);
+        PetRequest petRequest3 = new PetRequest(owner.getId(), "Nemo", PetTypeRequest.FISH);
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest1)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest2)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest3)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/owners/{ownerId}/pets", owner.getId()))
+        mockMvc.perform(get("/pets"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
     }
@@ -221,25 +221,19 @@ class PetControllerTest {
         owner2.setTelephone("987654321");
         owner2 = ownerRepository.save(owner2);
 
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner.getId())
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest)))
                 .andExpect(status().isCreated());
 
-        PetRequest petRequest2 = new PetRequest("Max", PetTypeRequest.DOG);
-        mockMvc.perform(post("/owners/{ownerId}/pets", owner2.getId())
+        PetRequest petRequest2 = new PetRequest(owner2.getId(), "Max", PetTypeRequest.DOG);
+        mockMvc.perform(post("/pets")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(petRequest2)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/owners/{ownerId}/pets", owner.getId()))
+        mockMvc.perform(get("/pets"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name").value("Fluffy"));
-
-        mockMvc.perform(get("/owners/{ownerId}/pets", owner2.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name").value("Max"));
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 }

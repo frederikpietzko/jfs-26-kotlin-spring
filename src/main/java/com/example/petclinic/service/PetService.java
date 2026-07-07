@@ -20,6 +20,14 @@ public class PetService {
     private final OwnerRepository ownerRepository;
 
     @Transactional(readOnly = true)
+    public List<Pet> findAll() {
+        log.debug("Fetching all pets");
+        List<Pet> pets = petRepository.findAll();
+        log.debug("Found {} pets", pets.size());
+        return pets;
+    }
+
+    @Transactional(readOnly = true)
     public List<Pet> findByOwnerId(Long ownerId) {
         log.debug("Fetching pets for owner id: {}", ownerId);
         final var owner = ownerRepository.findById(ownerId).orElse(null);
