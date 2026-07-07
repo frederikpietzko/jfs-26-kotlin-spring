@@ -37,6 +37,14 @@ A guided Tour
 
 # Future
 
+<v-clicks>
+
+- better integration with Lombok
+- Kotlin Toolchain
+- Compose HTML to do SSR on the JVM + Rehydration with Kotlin/JS and Kotlin/WASM
+
+</v-clicks>
+
 ---
 
 # Q&A
