@@ -24,7 +24,9 @@ public class VetController {
 
     @GetMapping
     public List<VetResponse> getAll() {
-        return vetService.findAll();
+        return vetService.findAll().stream()
+                .map(VetResponse::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -33,7 +35,7 @@ public class VetController {
         if (vet == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(vet);
+        return ResponseEntity.ok(VetResponse.fromEntity(vet));
     }
 
     @PostMapping
@@ -47,7 +49,7 @@ public class VetController {
         final var entity = new Vet(null, request.firstName(), request.lastName(), specialties);
 
         final var saved = vetService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(VetResponse.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
@@ -64,7 +66,7 @@ public class VetController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(VetResponse.fromEntity(updated));
     }
 
     @DeleteMapping("/{id}")

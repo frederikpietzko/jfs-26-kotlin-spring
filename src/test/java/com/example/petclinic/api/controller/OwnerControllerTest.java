@@ -3,6 +3,8 @@ package com.example.petclinic.api.controller;
 import com.example.petclinic.api.dto.OwnerRequest;
 import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.service.OwnerService;
+
+import java.util.HashSet;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +49,8 @@ class OwnerControllerTest {
 
     @Test
     void shouldCreateOwner() throws Exception {
-        when(ownerService.save(any(Owner.class))).thenReturn(null);
+        Owner owner = new Owner(1L, "John", "Doe", "123 Main St", "Springfield", "123456789", new HashSet<>());
+        when(ownerService.save(any(Owner.class))).thenReturn(owner);
 
         mockMvc.perform(post("/owners")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +62,8 @@ class OwnerControllerTest {
 
     @Test
     void shouldReturnAllOwners() throws Exception {
-        when(ownerService.findAll()).thenReturn(Collections.emptyList());
+        Owner owner = new Owner(1L, "John", "Doe", "123 Main St", "Springfield", "123456789", new HashSet<>());
+        when(ownerService.findAll()).thenReturn(java.util.List.of(owner));
 
         mockMvc.perform(get("/owners"))
                 .andExpect(status().isOk());

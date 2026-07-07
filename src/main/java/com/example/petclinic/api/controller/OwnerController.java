@@ -22,7 +22,9 @@ public class OwnerController {
 
     @GetMapping
     public List<OwnerResponse> getAll() {
-        return ownerService.findAll();
+        return ownerService.findAll().stream()
+                .map(OwnerResponse::fromEntity)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -31,7 +33,7 @@ public class OwnerController {
         if (owner == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(owner);
+        return ResponseEntity.ok(OwnerResponse.fromEntity(owner));
     }
 
     @PostMapping
@@ -39,7 +41,7 @@ public class OwnerController {
         final var entity = new Owner(null, request.firstName(), request.lastName(), request.address(), request.city(), request.telephone(), new HashSet<>());
 
         final var saved = ownerService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(OwnerResponse.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
@@ -50,7 +52,7 @@ public class OwnerController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(OwnerResponse.fromEntity(updated));
     }
 
     @DeleteMapping("/{id}")

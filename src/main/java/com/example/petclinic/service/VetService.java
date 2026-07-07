@@ -1,6 +1,5 @@
 package com.example.petclinic.service;
 
-import com.example.petclinic.api.dto.VetResponse;
 import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.domain.entity.Vet;
 import com.example.petclinic.domain.repository.SpecialityRepository;
@@ -10,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,33 +19,29 @@ public class VetService {
     private final SpecialityRepository specialityRepository;
 
     @Transactional(readOnly = true)
-    public List<VetResponse> findAll() {
-        return vetRepository.findAll().stream()
-                .map(VetResponse::fromEntity)
-                .collect(Collectors.toList());
+    public List<Vet> findAll() {
+        return vetRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public VetResponse findById(Long id) {
+    public Vet findById(Long id) {
         return vetRepository.findById(id)
-                .map(VetResponse::fromEntity)
                 .orElse(null);
     }
 
     @Transactional
-    public VetResponse save(Vet entity) {
+    public Vet save(Vet entity) {
         if (entity.getSpecialties() != null) {
             for (Speciality specialty : entity.getSpecialties()) {
                 final var managed = specialityRepository.findById(specialty.getId()).orElse(specialty);
                 specialty.setId(managed.getId());
             }
         }
-        final var saved = vetRepository.save(entity);
-        return VetResponse.fromEntity(saved);
+        return vetRepository.save(entity);
     }
 
     @Transactional
-    public VetResponse update(Long id, Vet entity) {
+    public Vet update(Long id, Vet entity) {
         final var existingOpt = vetRepository.findById(id);
         if (existingOpt.isEmpty()) {
             return null;
@@ -62,8 +56,7 @@ public class VetService {
         existing.setFirstName(entity.getFirstName());
         existing.setLastName(entity.getLastName());
         existing.setSpecialties(entity.getSpecialties());
-        final var saved = vetRepository.save(existing);
-        return VetResponse.fromEntity(saved);
+        return vetRepository.save(existing);
     }
 
     @Transactional

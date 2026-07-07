@@ -23,7 +23,9 @@ public class PetController {
 
     @GetMapping
     public List<PetResponse> getByOwnerId(@PathVariable Long ownerId) {
-        return petService.findByOwnerId(ownerId);
+        return petService.findByOwnerId(ownerId).stream()
+                .map(PetResponse::fromEntity)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -32,7 +34,7 @@ public class PetController {
         if (pet == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(pet);
+        return ResponseEntity.ok(PetResponse.fromEntity(pet));
     }
 
     @PostMapping
@@ -42,7 +44,7 @@ public class PetController {
         final var entity = new Pet(null, request.name(), request.type().toEntity(), null, owner, new HashSet<>());
 
         final var saved = petService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(PetResponse.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
@@ -55,7 +57,7 @@ public class PetController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(PetResponse.fromEntity(updated));
     }
 
     @DeleteMapping("/{id}")

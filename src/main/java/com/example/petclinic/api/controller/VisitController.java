@@ -23,7 +23,9 @@ public class VisitController {
 
     @GetMapping
     public List<VisitResponse> getByPetId(@PathVariable Long petId) {
-        return visitService.findByPetId(petId);
+        return visitService.findByPetId(petId).stream()
+                .map(VisitResponse::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -32,7 +34,7 @@ public class VisitController {
         if (visit == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(visit);
+        return ResponseEntity.ok(VisitResponse.fromEntity(visit));
     }
 
     @PostMapping
@@ -42,7 +44,7 @@ public class VisitController {
         final var entity = new Visit(null, request.date(), request.description(), pet);
 
         final var saved = visitService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(VisitResponse.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
@@ -55,7 +57,7 @@ public class VisitController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(VisitResponse.fromEntity(updated));
     }
 
     @DeleteMapping("/{id}")

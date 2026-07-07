@@ -22,7 +22,9 @@ public class SpecialityController {
 
     @GetMapping
     public List<SpecialityResponse> getAll() {
-        return specialityService.findAll();
+        return specialityService.findAll().stream()
+                .map(SpecialityResponse::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -31,7 +33,7 @@ public class SpecialityController {
         if (speciality == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(speciality);
+        return ResponseEntity.ok(SpecialityResponse.fromEntity(speciality));
     }
 
     @PostMapping
@@ -39,7 +41,7 @@ public class SpecialityController {
         final var entity = new Speciality(null, request.name(), new HashSet<>());
 
         final var saved = specialityService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SpecialityResponse.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
@@ -50,7 +52,7 @@ public class SpecialityController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(SpecialityResponse.fromEntity(updated));
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,5 @@
 package com.example.petclinic.service;
 
-import com.example.petclinic.api.dto.OwnerResponse;
 import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,33 +15,28 @@ public class OwnerService {
     private final OwnerRepository ownerRepository;
 
     @Transactional(readOnly = true)
-    public List<OwnerResponse> findAll() {
-        return ownerRepository.findAll().stream()
-                .map(OwnerResponse::fromEntity)
-                .toList();
+    public List<Owner> findAll() {
+        return ownerRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public OwnerResponse findById(Long id) {
+    public Owner findById(Long id) {
         return ownerRepository.findById(id)
-                .map(OwnerResponse::fromEntity)
                 .orElse(null);
     }
 
     @Transactional
-    public OwnerResponse save(Owner entity) {
-        final var saved = ownerRepository.save(entity);
-        return OwnerResponse.fromEntity(saved);
+    public Owner save(Owner entity) {
+        return ownerRepository.save(entity);
     }
 
     @Transactional
-    public OwnerResponse update(Long id, Owner entity) {
+    public Owner update(Long id, Owner entity) {
         if (!ownerRepository.existsById(id)) {
             return null;
         }
         entity.setId(id);
-        final var saved = ownerRepository.save(entity);
-        return OwnerResponse.fromEntity(saved);
+        return ownerRepository.save(entity);
     }
 
     @Transactional

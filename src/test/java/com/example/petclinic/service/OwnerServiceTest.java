@@ -1,6 +1,5 @@
 package com.example.petclinic.service;
 
-import com.example.petclinic.api.dto.OwnerResponse;
 import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.repository.OwnerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,11 +59,11 @@ class OwnerServiceTest {
     void shouldCreateOwner() {
         when(ownerRepository.save(any(Owner.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        OwnerResponse response = ownerService.save(owner);
+        Owner result = ownerService.save(owner);
 
-        assertNotNull(response);
-        assertEquals("John", response.firstName());
-        assertEquals("Doe", response.lastName());
+        assertNotNull(result);
+        assertEquals("John", result.getFirstName());
+        assertEquals("Doe", result.getLastName());
         verify(ownerRepository, times(1)).save(any(Owner.class));
     }
 
@@ -72,10 +71,10 @@ class OwnerServiceTest {
     void shouldFindAllOwners() {
         when(ownerRepository.findAll()).thenReturn(List.of(owner));
 
-        List<OwnerResponse> responses = ownerService.findAll();
+        List<Owner> results = ownerService.findAll();
 
-        assertNotNull(responses);
-        assertEquals(1, responses.size());
-        assertEquals("John", responses.get(0).firstName());
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals("John", results.get(0).getFirstName());
     }
 }
