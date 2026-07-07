@@ -32,6 +32,7 @@
         <!-- Kotlin Dev Build -->
         <kotlin.version>2.4.20-dev-7885</kotlin.version>
         <mappie.version>2.4.0-2.4.2</mappie.version>
+        <kotest.version>6.2.0</kotest.version>
     </properties>
     <dependencies>
         <dependency>
@@ -102,11 +103,6 @@
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-collections-immutable-jvm</artifactId>
-            <version>0.5.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
@@ -114,6 +110,12 @@
             <groupId>tech.mappie</groupId>
             <artifactId>mappie-api-jvm</artifactId>
             <version>${mappie.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-assertions-core-jvm</artifactId>
+            <version>${kotest.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <pluginRepositories>

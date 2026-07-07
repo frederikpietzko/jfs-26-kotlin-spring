@@ -1,121 +1,115 @@
-package com.example.petclinic.service;
+package com.example.petclinic.service
 
-import com.example.petclinic.domain.entity.Owner;
-import com.example.petclinic.domain.repository.OwnerRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.example.petclinic.domain.entity.Owner
+import com.example.petclinic.domain.repository.OwnerRepository
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import jakarta.validation.Validator
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @Transactional
-class OwnerServiceTest {
+internal class OwnerServiceTest {
+    @Autowired
+    lateinit var ownerService: OwnerService
 
     @Autowired
-    private OwnerService ownerService;
+    lateinit var ownerRepository: OwnerRepository
 
     @Autowired
-    private OwnerRepository ownerRepository;
+    lateinit var validator: Validator
 
-    @Autowired
-    private Validator validator;
-
-    private Owner owner;
+    private var owner: Owner? = null
 
     @BeforeEach
-    void setUp() {
-        ownerRepository.deleteAll();
-        owner = new Owner();
-        owner.setFirstName("John");
-        owner.setLastName("Doe");
-        owner.setAddress("123 Main St");
-        owner.setCity("Springfield");
-        owner.setTelephone("123456789");
+    fun setUp() {
+        ownerRepository.deleteAll()
+        owner = Owner(
+            id = null,
+            firstName = "John",
+            lastName = "Doe",
+            address = "123 Main St",
+            city = "Springfield",
+            telephone = "123456789"
+        )
     }
 
     @Test
-    void shouldValidateOwnerRequest_emptyDTO_failsValidation() {
-        Owner emptyOwner = new Owner();
+    fun shouldValidateOwnerRequest_emptyDTO_failsValidation() {
+        val emptyOwner = Owner()
 
-        Set<ConstraintViolation<Owner>> violations = validator.validate(emptyOwner);
-
-        assertTrue(violations.size() >= 2);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("firstName")));
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("lastName")));
+        val violations = validator.validate<Owner?>(emptyOwner)
+        violations.size shouldBe 2
+        violations.map { it.propertyPath.toString() } shouldContainAll listOf("firstName", "lastName")
     }
 
     @Test
-    void shouldFindOwnerById() {
-        Owner saved = ownerService.save(owner);
+    fun shouldFindOwnerById() {
+        val saved = ownerService.save(owner)
 
-        Owner result = ownerService.findById(saved.getId());
+        val result = ownerService.findById(saved.id)
 
-        assertNotNull(result);
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
+        result.shouldNotBeNull()
+        result.firstName shouldBe "John"
+        result.lastName shouldBe "Doe"
     }
 
     @Test
-    void shouldUpdateOwner() {
-        Owner saved = ownerService.save(owner);
-        saved.setFirstName("Johnny");
-        saved.setLastName("Smith");
+    fun shouldUpdateOwner() {
+        val saved = ownerService.save(owner)
+        saved.firstName = "Johnny"
+        saved.lastName = "Smith"
 
-        Owner updated = ownerService.update(saved.getId(), saved);
-
-        assertNotNull(updated);
-        assertEquals("Johnny", updated.getFirstName());
-        assertEquals("Smith", updated.getLastName());
-        assertEquals(1, ownerRepository.count());
+        val updated = ownerService.update(saved.id, saved)
+        updated.shouldNotBeNull()
+        updated.firstName shouldBe "Johnny"
+        updated.lastName shouldBe "Smith"
+        ownerRepository.count() shouldBe 1
     }
 
     @Test
-    void shouldDeleteOwner() {
-        Owner saved = ownerService.save(owner);
-        Long id = saved.getId();
+    fun shouldDeleteOwner() {
+        val saved = ownerService.save(owner)
+        val id = saved.id
 
-        ownerService.delete(id);
-
-        assertNull(ownerService.findById(id));
-        assertEquals(0, ownerRepository.count());
+        ownerService.delete(id)
+        ownerService.findById(id).shouldBeNull()
+        ownerRepository.count() shouldBe 0
     }
 
     @Test
-    void shouldCreateOwner() {
-        Owner result = ownerService.save(owner);
-
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals(1, ownerRepository.count());
+    fun shouldCreateOwner() {
+        val result = ownerService.save(owner)
+        result.shouldNotBeNull()
+        result.id.shouldNotBeNull()
+        result.firstName shouldBe "John"
+        result.lastName shouldBe "Doe"
+        ownerRepository.count() shouldBe 1
     }
 
     @Test
-    void shouldFindAllOwners() {
-        ownerService.save(owner);
-        Owner owner2 = new Owner();
-        owner2.setFirstName("Jane");
-        owner2.setLastName("Smith");
-        owner2.setAddress("456 Oak Ave");
-        owner2.setCity("Shelbyville");
-        owner2.setTelephone("987654321");
-        ownerService.save(owner2);
+    fun shouldFindAllOwners() {
+        ownerService.save(owner)
+        val owner2 = Owner(
+            firstName = "Jane",
+            lastName = "Smith",
+            address = "456 Oak Ave",
+            city = "Shelbyville",
+            telephone = "987654321"
+        )
+        ownerService.save(owner2)
 
-        List<Owner> results = ownerService.findAll();
+        val results = ownerService.findAll()
 
-        assertNotNull(results);
-        assertEquals(2, results.size());
-        assertEquals("John", results.get(0).getFirstName());
-        assertEquals("Jane", results.get(1).getFirstName());
+        results.shouldNotBeNull()
+        results.size shouldBe 2
+        results[0].firstName shouldBe "John"
+        results[1].firstName shouldBe "Jane"
     }
 }
