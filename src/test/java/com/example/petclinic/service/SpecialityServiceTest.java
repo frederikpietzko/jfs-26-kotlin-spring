@@ -2,6 +2,7 @@ package com.example.petclinic.service;
 
 import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.domain.repository.SpecialityRepository;
+import com.example.petclinic.domain.repository.VetRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,16 @@ class SpecialityServiceTest {
     private SpecialityRepository specialityRepository;
 
     @Autowired
+    private VetRepository vetRepository;
+
+    @Autowired
     private Validator validator;
 
     private Speciality speciality;
 
     @BeforeEach
     void setUp() {
+        vetRepository.deleteAll();
         specialityRepository.deleteAll();
         speciality = new Speciality();
         speciality.setName("Cardiology");
