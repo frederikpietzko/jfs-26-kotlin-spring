@@ -2,6 +2,7 @@ package com.example.petclinic.api.controller;
 
 import com.example.petclinic.api.dto.VisitRequest;
 import com.example.petclinic.api.dto.VisitResponse;
+import com.example.petclinic.api.mapper.VisitMapper;
 import com.example.petclinic.domain.entity.Pet;
 import com.example.petclinic.domain.entity.Visit;
 import com.example.petclinic.service.VisitService;
@@ -20,12 +21,13 @@ import java.util.List;
 public class VisitController {
 
     private final VisitService visitService;
+    private final VisitMapper visitMapper;
 
     @GetMapping
     public List<VisitResponse> getByPetId(@PathVariable Long petId) {
         return visitService.findByPetId(petId).stream()
-                .map(VisitResponse::fromEntity)
-                .collect(java.util.stream.Collectors.toList());
+                .map(visitMapper::toVisitResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -34,30 +36,33 @@ public class VisitController {
         if (visit == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(VisitResponse.fromEntity(visit));
+        return ResponseEntity.ok(visitMapper.toVisitResponse(visit));
     }
 
     @PostMapping
     public ResponseEntity<VisitResponse> create(@PathVariable Long petId, @Valid @RequestBody VisitRequest request) {
         final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
 
-        final var entity = new Visit(null, request.date(), request.description(), pet);
+        final var entity = visitMapper.toVisit(request);
+        entity.setPet(pet);
 
         final var saved = visitService.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(VisitResponse.fromEntity(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(visitMapper.toVisitResponse(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VisitResponse> update(@PathVariable Long petId, @PathVariable Long id, @Valid @RequestBody VisitRequest request) {
         final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
 
-        final var entity = new Visit(id, request.date(), request.description(), pet);
+        final var entity = visitMapper.toVisit(request);
+        entity.setId(id);
+        entity.setPet(pet);
 
         final var updated = visitService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(VisitResponse.fromEntity(updated));
+        return ResponseEntity.ok(visitMapper.toVisitResponse(updated));
     }
 
     @DeleteMapping("/{id}")
