@@ -2,73 +2,69 @@ package com.example.petclinic.api.controller;
 
 import com.example.petclinic.api.dto.OwnerRequest;
 import com.example.petclinic.domain.entity.Owner;
-import com.example.petclinic.service.OwnerService;
+import com.example.petclinic.domain.repository.OwnerRepository;
 
 import java.util.HashSet;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = OwnerController.class)
+@SpringBootTest(properties = {
+    "spring.profiles.active=test"
+})
+@AutoConfigureMockMvc
 @Import(TestSecurityConfig.class)
 class OwnerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private OwnerService ownerService;
+    @Autowired
+    private OwnerRepository ownerRepository;
 
     private ObjectMapper objectMapper;
     private OwnerRequest request;
 
     @BeforeEach
     void setUp() {
+        ownerRepository.deleteAll();
         objectMapper = new ObjectMapper();
         request = new OwnerRequest("John", "Doe", "123 Main St", "Springfield", "123456789");
     }
 
     @Test
     void shouldCreateOwner() throws Exception {
-        Owner owner = new Owner(1L, "John", "Doe", "123 Main St", "Springfield", "123456789", new HashSet<>());
-        when(ownerService.save(any(Owner.class))).thenReturn(owner);
-
         mockMvc.perform(post("/owners")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        verify(ownerService, times(1)).save(any(Owner.class));
+        assert ownerRepository.count() == 1;
+        Owner saved = ownerRepository.findAll().getFirst();
+        assert saved.getFirstName().equals("John");
+        assert saved.getLastName().equals("Doe");
     }
 
     @Test
     void shouldReturnAllOwners() throws Exception {
-        Owner owner = new Owner(1L, "John", "Doe", "123 Main St", "Springfield", "123456789", new HashSet<>());
-        when(ownerService.findAll()).thenReturn(java.util.List.of(owner));
+        Owner owner = new Owner(null, "John", "Doe", "123 Main St", "Springfield", "123456789", new HashSet<>());
+        ownerRepository.save(owner);
+        Owner owner2 = new Owner(null, "Jane", "Smith", "456 Oak Ave", "Shelbyville", "987654321", new HashSet<>());
+        ownerRepository.save(owner2);
 
         mockMvc.perform(get("/owners"))
-                .andExpect(status().isOk());
-
-        verify(ownerService, times(1)).findAll();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test
@@ -79,5 +75,7 @@ class OwnerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(emptyRequest)))
                 .andExpect(status().isBadRequest());
+
+        assert ownerRepository.count() == 0;
     }
 }

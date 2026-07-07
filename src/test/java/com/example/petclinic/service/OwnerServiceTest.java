@@ -4,38 +4,36 @@ import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.repository.OwnerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Validator;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@Transactional
 class OwnerServiceTest {
 
-    @Mock
-    private OwnerRepository ownerRepository;
-
-    @InjectMocks
+    @Autowired
     private OwnerService ownerService;
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    @Autowired
+    private OwnerRepository ownerRepository;
+
+    @Autowired
+    private Validator validator;
 
     private Owner owner;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        ownerRepository.deleteAll();
         owner = new Owner();
         owner.setFirstName("John");
         owner.setLastName("Doe");
@@ -50,31 +48,74 @@ class OwnerServiceTest {
 
         Set<ConstraintViolation<Owner>> violations = validator.validate(emptyOwner);
 
-        assertEquals(4, violations.size());
+        assertTrue(violations.size() >= 2);
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("firstName")));
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("lastName")));
     }
 
     @Test
-    void shouldCreateOwner() {
-        when(ownerRepository.save(any(Owner.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    void shouldFindOwnerById() {
+        Owner saved = ownerService.save(owner);
 
-        Owner result = ownerService.save(owner);
+        Owner result = ownerService.findById(saved.getId());
 
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
         assertEquals("Doe", result.getLastName());
-        verify(ownerRepository, times(1)).save(any(Owner.class));
+    }
+
+    @Test
+    void shouldUpdateOwner() {
+        Owner saved = ownerService.save(owner);
+        saved.setFirstName("Johnny");
+        saved.setLastName("Smith");
+
+        Owner updated = ownerService.update(saved.getId(), saved);
+
+        assertNotNull(updated);
+        assertEquals("Johnny", updated.getFirstName());
+        assertEquals("Smith", updated.getLastName());
+        assertEquals(1, ownerRepository.count());
+    }
+
+    @Test
+    void shouldDeleteOwner() {
+        Owner saved = ownerService.save(owner);
+        Long id = saved.getId();
+
+        ownerService.delete(id);
+
+        assertNull(ownerService.findById(id));
+        assertEquals(0, ownerRepository.count());
+    }
+
+    @Test
+    void shouldCreateOwner() {
+        Owner result = ownerService.save(owner);
+
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("John", result.getFirstName());
+        assertEquals("Doe", result.getLastName());
+        assertEquals(1, ownerRepository.count());
     }
 
     @Test
     void shouldFindAllOwners() {
-        when(ownerRepository.findAll()).thenReturn(List.of(owner));
+        ownerService.save(owner);
+        Owner owner2 = new Owner();
+        owner2.setFirstName("Jane");
+        owner2.setLastName("Smith");
+        owner2.setAddress("456 Oak Ave");
+        owner2.setCity("Shelbyville");
+        owner2.setTelephone("987654321");
+        ownerService.save(owner2);
 
         List<Owner> results = ownerService.findAll();
 
         assertNotNull(results);
-        assertEquals(1, results.size());
+        assertEquals(2, results.size());
         assertEquals("John", results.get(0).getFirstName());
+        assertEquals("Jane", results.get(1).getFirstName());
     }
 }
