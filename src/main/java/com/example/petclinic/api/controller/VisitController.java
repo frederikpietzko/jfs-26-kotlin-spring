@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,7 @@ public class VisitController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VisitResponse> getById(@PathVariable Long id) {
-        VisitResponse visit = visitService.findById(id);
+        final var visit = visitService.findById(id);
         if (visit == null) {
             return ResponseEntity.notFound().build();
         }
@@ -36,21 +37,21 @@ public class VisitController {
 
     @PostMapping
     public ResponseEntity<VisitResponse> create(@PathVariable Long petId, @Valid @RequestBody VisitRequest request) {
-        Pet pet = new Pet(petId, null, null, null, null, new java.util.HashSet<>());
+        final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
 
-        Visit entity = new Visit(null, request.date(), request.description(), pet);
+        final var entity = new Visit(null, request.date(), request.description(), pet);
 
-        VisitResponse saved = visitService.save(entity);
+        final var saved = visitService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VisitResponse> update(@PathVariable Long petId, @PathVariable Long id, @Valid @RequestBody VisitRequest request) {
-        Pet pet = new Pet(petId, null, null, null, null, new java.util.HashSet<>());
+        final var pet = new Pet(petId, null, null, null, null, new HashSet<>());
 
-        Visit entity = new Visit(id, request.date(), request.description(), pet);
+        final var entity = new Visit(id, request.date(), request.description(), pet);
 
-        VisitResponse updated = visitService.update(id, entity);
+        final var updated = visitService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }

@@ -32,7 +32,7 @@ public class SpecialityService {
 
     @Transactional
     public SpecialityResponse save(Speciality entity) {
-        Speciality saved = specialityRepository.save(entity);
+        final var saved = specialityRepository.save(entity);
         return SpecialityResponse.fromEntity(saved);
     }
 
@@ -42,7 +42,7 @@ public class SpecialityService {
             return null;
         }
         entity.setId(id);
-        Speciality saved = specialityRepository.save(entity);
+        final var saved = specialityRepository.save(entity);
         return SpecialityResponse.fromEntity(saved);
     }
 

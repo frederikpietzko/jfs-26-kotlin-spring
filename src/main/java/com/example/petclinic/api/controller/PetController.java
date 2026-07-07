@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,7 @@ public class PetController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PetResponse> getById(@PathVariable Long id) {
-        PetResponse pet = petService.findById(id);
+        final var pet = petService.findById(id);
         if (pet == null) {
             return ResponseEntity.notFound().build();
         }
@@ -36,21 +37,21 @@ public class PetController {
 
     @PostMapping
     public ResponseEntity<PetResponse> create(@PathVariable Long ownerId, @Valid @RequestBody PetRequest request) {
-        Owner owner = new Owner(ownerId, null, null, null, null, null, new java.util.HashSet<>());
+        final var owner = new Owner(ownerId, null, null, null, null, null, new HashSet<>());
 
-        Pet entity = new Pet(null, request.name(), request.type().toEntity(), null, owner, new java.util.HashSet<>());
+        final var entity = new Pet(null, request.name(), request.type().toEntity(), null, owner, new HashSet<>());
 
-        PetResponse saved = petService.save(entity);
+        final var saved = petService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PetResponse> update(@PathVariable Long ownerId, @PathVariable Long id, @Valid @RequestBody PetRequest request) {
-        Owner owner = new Owner(ownerId, null, null, null, null, null, new java.util.HashSet<>());
+        final var owner = new Owner(ownerId, null, null, null, null, null, new HashSet<>());
 
-        Pet entity = new Pet(id, request.name(), request.type().toEntity(), null, owner, new java.util.HashSet<>());
+        final var entity = new Pet(id, request.name(), request.type().toEntity(), null, owner, new HashSet<>());
 
-        PetResponse updated = petService.update(id, entity);
+        final var updated = petService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }

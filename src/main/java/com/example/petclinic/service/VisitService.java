@@ -22,7 +22,7 @@ public class VisitService {
 
     @Transactional(readOnly = true)
     public List<VisitResponse> findByPetId(Long petId) {
-        Pet pet = petRepository.findById(petId).orElse(null);
+        final var pet = petRepository.findById(petId).orElse(null);
         if (pet == null) {
             return List.of();
         }
@@ -40,28 +40,28 @@ public class VisitService {
 
     @Transactional
     public VisitResponse save(Visit entity) {
-        Pet pet = petRepository.findById(entity.getPet().getId()).orElse(null);
+        final var pet = petRepository.findById(entity.getPet().getId()).orElse(null);
         if (pet == null) {
             return null;
         }
-        Visit withPet = new Visit(entity.getId(), entity.getDate(), entity.getDescription(), pet);
-        Visit saved = visitRepository.save(withPet);
+        final var withPet = new Visit(entity.getId(), entity.getDate(), entity.getDescription(), pet);
+        final var saved = visitRepository.save(withPet);
         return VisitResponse.fromEntity(saved);
     }
 
     @Transactional
     public VisitResponse update(Long id, Visit entity) {
-        Optional<Visit> existingOpt = visitRepository.findById(id);
+        final var existingOpt = visitRepository.findById(id);
         if (existingOpt.isEmpty()) {
             return null;
         }
-        Pet pet = petRepository.findById(entity.getPet().getId()).orElse(null);
+        final var pet = petRepository.findById(entity.getPet().getId()).orElse(null);
         if (pet == null) {
             return null;
         }
-        Visit existing = existingOpt.get();
-        Visit updated = new Visit(existing.getId(), entity.getDate(), entity.getDescription(), pet);
-        Visit saved = visitRepository.save(updated);
+        final var existing = existingOpt.get();
+        final var updated = new Visit(existing.getId(), entity.getDate(), entity.getDescription(), pet);
+        final var saved = visitRepository.save(updated);
         return VisitResponse.fromEntity(saved);
     }
 

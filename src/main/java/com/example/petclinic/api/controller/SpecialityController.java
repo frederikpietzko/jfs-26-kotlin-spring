@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class SpecialityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SpecialityResponse> getById(@PathVariable Long id) {
-        SpecialityResponse speciality = specialityService.findById(id);
+        final var speciality = specialityService.findById(id);
         if (speciality == null) {
             return ResponseEntity.notFound().build();
         }
@@ -35,17 +36,17 @@ public class SpecialityController {
 
     @PostMapping
     public ResponseEntity<SpecialityResponse> create(@Valid @RequestBody SpecialityRequest request) {
-        Speciality entity = new Speciality(null, request.name(), new java.util.HashSet<>());
+        final var entity = new Speciality(null, request.name(), new HashSet<>());
 
-        SpecialityResponse saved = specialityService.save(entity);
+        final var saved = specialityService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SpecialityResponse> update(@PathVariable Long id, @Valid @RequestBody SpecialityRequest request) {
-        Speciality entity = new Speciality(null, request.name(), new java.util.HashSet<>());
+        final var entity = new Speciality(null, request.name(), new HashSet<>());
 
-        SpecialityResponse updated = specialityService.update(id, entity);
+        final var updated = specialityService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }

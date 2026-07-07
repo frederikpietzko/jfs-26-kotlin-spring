@@ -22,7 +22,7 @@ public class PetService {
 
     @Transactional(readOnly = true)
     public List<PetResponse> findByOwnerId(Long ownerId) {
-        Owner owner = ownerRepository.findById(ownerId).orElse(null);
+        final var owner = ownerRepository.findById(ownerId).orElse(null);
         if (owner == null) {
             return List.of();
         }
@@ -40,31 +40,31 @@ public class PetService {
 
     @Transactional
     public PetResponse save(Pet entity) {
-        Owner owner = ownerRepository.findById(entity.getOwner().getId()).orElse(null);
+        final var owner = ownerRepository.findById(entity.getOwner().getId()).orElse(null);
         if (owner == null) {
             return null;
         }
         entity.setOwner(owner);
-        Pet saved = petRepository.save(entity);
+        final var saved = petRepository.save(entity);
         return PetResponse.fromEntity(saved);
     }
 
     @Transactional
     public PetResponse update(Long id, Pet entity) {
-        Optional<Pet> existingOpt = petRepository.findById(id);
+        final var existingOpt = petRepository.findById(id);
         if (existingOpt.isEmpty()) {
             return null;
         }
-        Owner owner = ownerRepository.findById(entity.getOwner().getId()).orElse(null);
+        final var owner = ownerRepository.findById(entity.getOwner().getId()).orElse(null);
         if (owner == null) {
             return null;
         }
-        Pet existing = existingOpt.get();
+        final var existing = existingOpt.get();
         existing.setName(entity.getName());
         existing.setType(entity.getType());
         existing.setBirthDate(entity.getBirthDate());
         existing.setOwner(owner);
-        Pet saved = petRepository.save(existing);
+        final var saved = petRepository.save(existing);
         return PetResponse.fromEntity(saved);
     }
 

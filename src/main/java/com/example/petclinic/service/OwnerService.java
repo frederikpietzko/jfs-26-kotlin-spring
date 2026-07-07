@@ -31,7 +31,7 @@ public class OwnerService {
 
     @Transactional
     public OwnerResponse save(Owner entity) {
-        Owner saved = ownerRepository.save(entity);
+        final var saved = ownerRepository.save(entity);
         return OwnerResponse.fromEntity(saved);
     }
 
@@ -41,7 +41,7 @@ public class OwnerService {
             return null;
         }
         entity.setId(id);
-        Owner saved = ownerRepository.save(entity);
+        final var saved = ownerRepository.save(entity);
         return OwnerResponse.fromEntity(saved);
     }
 

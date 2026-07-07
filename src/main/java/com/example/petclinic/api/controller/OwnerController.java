@@ -27,7 +27,7 @@ public class OwnerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OwnerResponse> getById(@PathVariable Long id) {
-        OwnerResponse owner = ownerService.findById(id);
+        final var owner = ownerService.findById(id);
         if (owner == null) {
             return ResponseEntity.notFound().build();
         }
@@ -36,17 +36,17 @@ public class OwnerController {
 
     @PostMapping
     public ResponseEntity<OwnerResponse> create(@Valid @RequestBody OwnerRequest request) {
-        Owner entity = new Owner(null, request.firstName(), request.lastName(), request.address(), request.city(), request.telephone(), new HashSet<>());
+        final var entity = new Owner(null, request.firstName(), request.lastName(), request.address(), request.city(), request.telephone(), new HashSet<>());
 
-        OwnerResponse saved = ownerService.save(entity);
+        final var saved = ownerService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OwnerResponse> update(@PathVariable Long id, @Valid @RequestBody OwnerRequest request) {
-        Owner entity = new Owner(null, request.firstName(), request.lastName(), request.address(), request.city(), request.telephone(), new HashSet<>());
+        final var entity = new Owner(null, request.firstName(), request.lastName(), request.address(), request.city(), request.telephone(), new HashSet<>());
 
-        OwnerResponse updated = ownerService.update(id, entity);
+        final var updated = ownerService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }

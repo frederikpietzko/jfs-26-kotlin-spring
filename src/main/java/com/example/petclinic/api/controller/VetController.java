@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @RestController
@@ -28,7 +29,7 @@ public class VetController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VetResponse> getById(@PathVariable Long id) {
-        VetResponse vet = vetService.findById(id);
+        final var vet = vetService.findById(id);
         if (vet == null) {
             return ResponseEntity.notFound().build();
         }
@@ -39,13 +40,13 @@ public class VetController {
     public ResponseEntity<VetResponse> create(@Valid @RequestBody VetRequest request) {
         Set<Speciality> specialties = request.specialityIds() != null
                 ? request.specialityIds().stream()
-                .map(id -> new Speciality(id, null, new java.util.HashSet<>()))
+                .map(id -> new Speciality(id, null, new HashSet<>()))
                 .collect(java.util.stream.Collectors.toSet())
                 : Set.of();
 
-        Vet entity = new Vet(null, request.firstName(), request.lastName(), specialties);
+        final var entity = new Vet(null, request.firstName(), request.lastName(), specialties);
 
-        VetResponse saved = vetService.save(entity);
+        final var saved = vetService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -53,13 +54,13 @@ public class VetController {
     public ResponseEntity<VetResponse> update(@PathVariable Long id, @Valid @RequestBody VetRequest request) {
         Set<Speciality> specialties = request.specialityIds() != null
                 ? request.specialityIds().stream()
-                .map(sId -> new Speciality(sId, null, new java.util.HashSet<>()))
+                .map(sId -> new Speciality(sId, null, new HashSet<>()))
                 .collect(java.util.stream.Collectors.toSet())
                 : Set.of();
 
-        Vet entity = new Vet(null, request.firstName(), request.lastName(), specialties);
+        final var entity = new Vet(null, request.firstName(), request.lastName(), specialties);
 
-        VetResponse updated = vetService.update(id, entity);
+        final var updated = vetService.update(id, entity);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }

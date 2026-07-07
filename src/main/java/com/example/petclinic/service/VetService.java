@@ -38,31 +38,31 @@ public class VetService {
     public VetResponse save(Vet entity) {
         if (entity.getSpecialties() != null) {
             for (Speciality specialty : entity.getSpecialties()) {
-                Speciality managed = specialityRepository.findById(specialty.getId()).orElse(specialty);
+                final var managed = specialityRepository.findById(specialty.getId()).orElse(specialty);
                 specialty.setId(managed.getId());
             }
         }
-        Vet saved = vetRepository.save(entity);
+        final var saved = vetRepository.save(entity);
         return VetResponse.fromEntity(saved);
     }
 
     @Transactional
     public VetResponse update(Long id, Vet entity) {
-        Optional<Vet> existingOpt = vetRepository.findById(id);
+        final var existingOpt = vetRepository.findById(id);
         if (existingOpt.isEmpty()) {
             return null;
         }
         if (entity.getSpecialties() != null) {
             for (Speciality specialty : entity.getSpecialties()) {
-                Speciality managed = specialityRepository.findById(specialty.getId()).orElse(specialty);
+                final var managed = specialityRepository.findById(specialty.getId()).orElse(specialty);
                 specialty.setId(managed.getId());
             }
         }
-        Vet existing = existingOpt.get();
+        final var existing = existingOpt.get();
         existing.setFirstName(entity.getFirstName());
         existing.setLastName(entity.getLastName());
         existing.setSpecialties(entity.getSpecialties());
-        Vet saved = vetRepository.save(existing);
+        final var saved = vetRepository.save(existing);
         return VetResponse.fromEntity(saved);
     }
 
