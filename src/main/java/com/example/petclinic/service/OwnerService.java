@@ -3,26 +3,23 @@ package com.example.petclinic.service;
 import com.example.petclinic.api.dto.OwnerResponse;
 import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.repository.OwnerRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OwnerService {
 
     private final OwnerRepository ownerRepository;
-
-    public OwnerService(OwnerRepository ownerRepository) {
-        this.ownerRepository = ownerRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<OwnerResponse> findAll() {
         return ownerRepository.findAll().stream()
                 .map(OwnerResponse::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)

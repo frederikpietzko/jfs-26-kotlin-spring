@@ -4,26 +4,21 @@ import com.example.petclinic.api.dto.VisitRequest;
 import com.example.petclinic.api.dto.VisitResponse;
 import com.example.petclinic.domain.entity.Pet;
 import com.example.petclinic.domain.entity.Visit;
-import com.example.petclinic.service.PetService;
 import com.example.petclinic.service.VisitService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/owners/{ownerId}/pets/{petId}/visits")
+@RequiredArgsConstructor
 public class VisitController {
 
     private final VisitService visitService;
-    private final PetService petService;
-
-    public VisitController(VisitService visitService, PetService petService) {
-        this.visitService = visitService;
-        this.petService = petService;
-    }
 
     @GetMapping
     public List<VisitResponse> getByPetId(@PathVariable Long petId) {
@@ -41,13 +36,9 @@ public class VisitController {
 
     @PostMapping
     public ResponseEntity<VisitResponse> create(@PathVariable Long petId, @Valid @RequestBody VisitRequest request) {
-        Pet pet = new Pet();
-        pet.setId(petId);
+        Pet pet = new Pet(petId, null, null, null, null, new java.util.HashSet<>());
 
-        Visit entity = new Visit();
-        entity.setDate(request.getDate());
-        entity.setDescription(request.getDescription());
-        entity.setPet(pet);
+        Visit entity = new Visit(null, request.date(), request.description(), pet);
 
         VisitResponse saved = visitService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -55,14 +46,9 @@ public class VisitController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VisitResponse> update(@PathVariable Long petId, @PathVariable Long id, @Valid @RequestBody VisitRequest request) {
-        Pet pet = new Pet();
-        pet.setId(petId);
+        Pet pet = new Pet(petId, null, null, null, null, new java.util.HashSet<>());
 
-        Visit entity = new Visit();
-        entity.setId(id);
-        entity.setDate(request.getDate());
-        entity.setDescription(request.getDescription());
-        entity.setPet(pet);
+        Visit entity = new Visit(id, request.date(), request.description(), pet);
 
         VisitResponse updated = visitService.update(id, entity);
         if (updated == null) {

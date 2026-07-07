@@ -4,22 +4,20 @@ import com.example.petclinic.api.dto.SpecialityRequest;
 import com.example.petclinic.api.dto.SpecialityResponse;
 import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.service.SpecialityService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/specialities")
+@RequiredArgsConstructor
 public class SpecialityController {
 
     private final SpecialityService specialityService;
-
-    public SpecialityController(SpecialityService specialityService) {
-        this.specialityService = specialityService;
-    }
 
     @GetMapping
     public List<SpecialityResponse> getAll() {
@@ -37,8 +35,7 @@ public class SpecialityController {
 
     @PostMapping
     public ResponseEntity<SpecialityResponse> create(@Valid @RequestBody SpecialityRequest request) {
-        Speciality entity = new Speciality();
-        entity.setName(request.getName());
+        Speciality entity = new Speciality(null, request.name(), new java.util.HashSet<>());
 
         SpecialityResponse saved = specialityService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -46,8 +43,7 @@ public class SpecialityController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SpecialityResponse> update(@PathVariable Long id, @Valid @RequestBody SpecialityRequest request) {
-        Speciality entity = new Speciality();
-        entity.setName(request.getName());
+        Speciality entity = new Speciality(null, request.name(), new java.util.HashSet<>());
 
         SpecialityResponse updated = specialityService.update(id, entity);
         if (updated == null) {

@@ -4,27 +4,22 @@ import com.example.petclinic.api.dto.VetRequest;
 import com.example.petclinic.api.dto.VetResponse;
 import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.domain.entity.Vet;
-import com.example.petclinic.service.SpecialityService;
 import com.example.petclinic.service.VetService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/vets")
+@RequiredArgsConstructor
 public class VetController {
 
     private final VetService vetService;
-    private final SpecialityService specialityService;
-
-    public VetController(VetService vetService, SpecialityService specialityService) {
-        this.vetService = vetService;
-        this.specialityService = specialityService;
-    }
 
     @GetMapping
     public List<VetResponse> getAll() {
@@ -42,20 +37,13 @@ public class VetController {
 
     @PostMapping
     public ResponseEntity<VetResponse> create(@Valid @RequestBody VetRequest request) {
-        Set<Speciality> specialties = request.getSpecialityIds() != null 
-                ? request.getSpecialityIds().stream()
-                        .map(id -> {
-                            Speciality s = new Speciality();
-                            s.setId(id);
-                            return s;
-                        })
-                        .collect(java.util.stream.Collectors.toSet())
+        Set<Speciality> specialties = request.specialityIds() != null
+                ? request.specialityIds().stream()
+                .map(id -> new Speciality(id, null, new java.util.HashSet<>()))
+                .collect(java.util.stream.Collectors.toSet())
                 : Set.of();
 
-        Vet entity = new Vet();
-        entity.setFirstName(request.getFirstName());
-        entity.setLastName(request.getLastName());
-        entity.setSpecialties(specialties);
+        Vet entity = new Vet(null, request.firstName(), request.lastName(), specialties);
 
         VetResponse saved = vetService.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -63,20 +51,13 @@ public class VetController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VetResponse> update(@PathVariable Long id, @Valid @RequestBody VetRequest request) {
-        Set<Speciality> specialties = request.getSpecialityIds() != null 
-                ? request.getSpecialityIds().stream()
-                        .map(sId -> {
-                            Speciality s = new Speciality();
-                            s.setId(sId);
-                            return s;
-                        })
-                        .collect(java.util.stream.Collectors.toSet())
+        Set<Speciality> specialties = request.specialityIds() != null
+                ? request.specialityIds().stream()
+                .map(sId -> new Speciality(sId, null, new java.util.HashSet<>()))
+                .collect(java.util.stream.Collectors.toSet())
                 : Set.of();
 
-        Vet entity = new Vet();
-        entity.setFirstName(request.getFirstName());
-        entity.setLastName(request.getLastName());
-        entity.setSpecialties(specialties);
+        Vet entity = new Vet(null, request.firstName(), request.lastName(), specialties);
 
         VetResponse updated = vetService.update(id, entity);
         if (updated == null) {

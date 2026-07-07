@@ -1,6 +1,5 @@
 package com.example.petclinic.domain.repository;
 
-import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.entity.Pet;
 import com.example.petclinic.domain.entity.Visit;
 import org.springframework.data.jpa.repository.JpaRepository;

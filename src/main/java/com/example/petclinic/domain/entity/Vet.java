@@ -3,11 +3,16 @@ package com.example.petclinic.domain.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "vets")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Vet {
 
     @Id
@@ -24,9 +29,9 @@ public class Vet {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "vet_specialties",
-        joinColumns = @JoinColumn(name = "vet_id"),
-        inverseJoinColumns = @JoinColumn(name = "specialty_id")
+            name = "vet_specialties",
+            joinColumns = @JoinColumn(name = "vet_id"),
+            inverseJoinColumns = @JoinColumn(name = "specialty_id")
     )
     private Set<Speciality> specialties = new HashSet<>();
 

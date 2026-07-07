@@ -19,6 +19,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,12 +42,7 @@ class OwnerControllerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        request = new OwnerRequest();
-        request.setFirstName("John");
-        request.setLastName("Doe");
-        request.setAddress("123 Main St");
-        request.setCity("Springfield");
-        request.setTelephone("123456789");
+        request = new OwnerRequest("John", "Doe", "123 Main St", "Springfield", "123456789");
     }
 
     @Test
@@ -62,7 +59,7 @@ class OwnerControllerTest {
 
     @Test
     void shouldReturnAllOwners() throws Exception {
-        when(ownerService.findAll()).thenReturn(java.util.Collections.emptyList());
+        when(ownerService.findAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/owners"))
                 .andExpect(status().isOk());
@@ -72,7 +69,7 @@ class OwnerControllerTest {
 
     @Test
     void shouldValidateEmptyRequest() throws Exception {
-        OwnerRequest emptyRequest = new OwnerRequest();
+        OwnerRequest emptyRequest = new OwnerRequest(null, null, null, null, null);
 
         mockMvc.perform(post("/owners")
                 .contentType(MediaType.APPLICATION_JSON)

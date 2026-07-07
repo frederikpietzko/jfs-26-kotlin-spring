@@ -5,6 +5,7 @@ import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.domain.entity.Vet;
 import com.example.petclinic.domain.repository.SpecialityRepository;
 import com.example.petclinic.domain.repository.VetRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,15 +14,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class VetService {
 
     private final VetRepository vetRepository;
     private final SpecialityRepository specialityRepository;
-
-    public VetService(VetRepository vetRepository, SpecialityRepository specialityRepository) {
-        this.vetRepository = vetRepository;
-        this.specialityRepository = specialityRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<VetResponse> findAll() {

@@ -1,36 +1,18 @@
 package com.example.petclinic.api.dto;
 
+import com.example.petclinic.domain.entity.Speciality;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SpecialityResponse {
-    private Long id;
-    private String name;
-
-    public Long getId() {
-        return id;
+public record SpecialityResponse(
+    Long id,
+    String name
+) {
+    public static SpecialityResponse fromEntity(Speciality speciality) {
+        return new SpecialityResponse(speciality.getId(), speciality.getName());
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public static SpecialityResponse fromEntity(com.example.petclinic.domain.entity.Speciality speciality) {
-        SpecialityResponse response = new SpecialityResponse();
-        response.setId(speciality.getId());
-        response.setName(speciality.getName());
-        return response;
-    }
-
-    public static Set<SpecialityResponse> fromEntities(Set<com.example.petclinic.domain.entity.Speciality> specialities) {
+    public static Set<SpecialityResponse> fromEntities(Set<Speciality> specialities) {
         if (specialities == null) {
             return Set.of();
         }

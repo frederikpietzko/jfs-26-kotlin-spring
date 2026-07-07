@@ -3,6 +3,7 @@ package com.example.petclinic.service;
 import com.example.petclinic.api.dto.SpecialityResponse;
 import com.example.petclinic.domain.entity.Speciality;
 import com.example.petclinic.domain.repository.SpecialityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,13 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SpecialityService {
 
     private final SpecialityRepository specialityRepository;
-
-    public SpecialityService(SpecialityRepository specialityRepository) {
-        this.specialityRepository = specialityRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<SpecialityResponse> findAll() {

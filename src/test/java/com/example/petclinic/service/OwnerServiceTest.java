@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -48,7 +49,7 @@ class OwnerServiceTest {
     void shouldValidateOwnerRequest_emptyDTO_failsValidation() {
         Owner emptyOwner = new Owner();
 
-        Set<jakarta.validation.ConstraintViolation<Owner>> violations = validator.validate(emptyOwner);
+        Set<ConstraintViolation<Owner>> violations = validator.validate(emptyOwner);
 
         assertEquals(4, violations.size());
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("firstName")));
@@ -62,8 +63,8 @@ class OwnerServiceTest {
         OwnerResponse response = ownerService.save(owner);
 
         assertNotNull(response);
-        assertEquals("John", response.getFirstName());
-        assertEquals("Doe", response.getLastName());
+        assertEquals("John", response.firstName());
+        assertEquals("Doe", response.lastName());
         verify(ownerRepository, times(1)).save(any(Owner.class));
     }
 
@@ -75,6 +76,6 @@ class OwnerServiceTest {
 
         assertNotNull(responses);
         assertEquals(1, responses.size());
-        assertEquals("John", responses.get(0).getFirstName());
+        assertEquals("John", responses.get(0).firstName());
     }
 }
