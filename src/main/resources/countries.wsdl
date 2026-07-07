@@ -20,10 +20,22 @@
         <part name="body" element="tns:getCountryResponse"/>
     </message>
 
+    <message name="GetAllCountriesRequest">
+        <part name="body" element="tns:getAllCountriesRequest"/>
+    </message>
+
+    <message name="GetAllCountriesResponse">
+        <part name="body" element="tns:getAllCountriesResponse"/>
+    </message>
+
     <portType name="CountriesPortType">
         <operation name="getCountry">
             <input message="tns:GetCountryRequest"/>
             <output message="tns:GetCountryResponse"/>
+        </operation>
+        <operation name="getAllCountries">
+            <input message="tns:GetAllCountriesRequest"/>
+            <output message="tns:GetAllCountriesResponse"/>
         </operation>
     </portType>
 
@@ -31,6 +43,15 @@
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" use="literal"/>
         <operation name="getCountry">
             <soap:operation soapAction="http://www.baeldung.com/springsoap/gen/getCountry"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="getAllCountries">
+            <soap:operation soapAction="http://www.baeldung.com/springsoap/gen/getAllCountries"/>
             <input>
                 <soap:body use="literal"/>
             </input>
