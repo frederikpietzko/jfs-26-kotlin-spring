@@ -1,7 +1,9 @@
 package com.example.petclinic
 
 import com.example.petclinic.api.dto.OwnerRequest
+import com.example.petclinic.api.dto.OwnerResponse
 import com.example.petclinic.api.mapper.OwnerMapper
+import com.example.petclinic.domain.entity.Owner
 import com.example.petclinic.service.OwnerService
 import jakarta.validation.Validator
 import org.springframework.beans.factory.BeanRegistrarDsl
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
 import org.springframework.web.servlet.function.router
+import tech.mappie.api.ObjectMappie
 
 @SpringBootApplication
 @Import(ProgrammaticConfig::class)
@@ -59,6 +62,9 @@ class ProgrammaticConfig : BeanRegistrarDsl({
     }
 })
 
+object OwnerMappie : ObjectMappie<Owner, OwnerResponse>() {
+}
+
 fun OwnerHandler(
     ownerService: OwnerService,
     ownerMapper: OwnerMapper,
@@ -70,8 +76,8 @@ fun OwnerHandler(
                 ok().body(
                     ownerService
                         .findAll()
-                        .map { ownerMapper.toOwnerResponse(it) }
                         .toList()
+                        .let { OwnerMappie.mapList(it) }
                 )
             }
             POST {
