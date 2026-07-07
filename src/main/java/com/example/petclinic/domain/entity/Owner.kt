@@ -1,42 +1,28 @@
-package com.example.petclinic.domain.entity;
+package com.example.petclinic.domain.entity
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotBlank
 
 @Entity
 @Table(name = "owners")
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-public class Owner {
-
+class Owner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    var id: Long? = null,
     @NotBlank
-    @NotNull
-    private String firstName;
-
+    var firstName: String? = null,
     @NotBlank
-    @NotNull
-    private String lastName;
+    var lastName: String? = null,
+    var address: String? = null,
+    var city: String? = null,
+    var telephone: String? = null,
+    pets: MutableSet<Pet> = mutableSetOf()
+) {
+    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    final val pets: Set<Pet> field = pets
 
-    private String address;
-
-    private String city;
-
-    private String telephone;
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Pet> pets = new HashSet<>();
+    fun addPet(pet: Pet) {
+        pets.add(pet)
+        pet.owner = this
+    }
 }

@@ -4,6 +4,7 @@ import com.example.petclinic.domain.entity.Owner;
 import com.example.petclinic.domain.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,7 @@ public class OwnerService {
     }
 
     @Transactional
+    @Nullable
     public Owner update(Long id, Owner entity) {
         log.debug("Updating owner with id: {}", id);
         if (!ownerRepository.existsById(id)) {
