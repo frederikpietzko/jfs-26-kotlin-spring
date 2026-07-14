@@ -1,14 +1,12 @@
-package com.example.petclinic.api.dto;
+package com.example.petclinic.api.dto
 
-import java.util.Set;
-
-public record OwnerResponse(
-    Long id,
-    String firstName,
-    String lastName,
-    String address,
-    String city,
-    String telephone,
-    Set<PetResponse> pets
-) {
-}
+@JvmRecord
+data class OwnerResponse(
+    val id: Long?,
+    val firstName: String?,
+    val lastName: String?,
+    val address: String?,
+    val city: String?,
+    val telephone: String?,
+    val pets: MutableSet<PetResponse?>?
+)

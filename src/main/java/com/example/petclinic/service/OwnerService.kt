@@ -1,66 +1,61 @@
-package com.example.petclinic.service;
+package com.example.petclinic.service
 
-import com.example.petclinic.domain.entity.Owner;
-import com.example.petclinic.domain.repository.OwnerRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import com.example.petclinic.domain.entity.Owner
+import com.example.petclinic.domain.repository.OwnerRepository
+import lombok.RequiredArgsConstructor
+import lombok.extern.slf4j.Slf4j
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OwnerService {
-
-    private final OwnerRepository ownerRepository;
+class OwnerService {
+    private val ownerRepository: OwnerRepository? = null
 
     @Transactional(readOnly = true)
-    public List<Owner> findAll() {
-        log.debug("Fetching all owners");
-        List<Owner> owners = ownerRepository.findAll();
-        log.debug("Found {} owners", owners.size());
-        return owners;
+    fun findAll(): MutableList<Owner> {
+        log.debug("Fetching all owners")
+        val owners = ownerRepository!!.findAll()
+        log.debug("Found {} owners", owners.size)
+        return owners
     }
 
     @Transactional(readOnly = true)
-    public Owner findById(Long id) {
-        log.debug("Fetching owner with id: {}", id);
-        Owner owner = ownerRepository.findById(id).orElse(null);
+    fun findById(id: Long): Owner? {
+        log.debug("Fetching owner with id: {}", id)
+        val owner = ownerRepository!!.findById(id).orElse(null)
         if (owner == null) {
-            log.warn("Owner not found with id: {}", id);
+            log.warn("Owner not found with id: {}", id)
         }
-        return owner;
+        return owner
     }
 
     @Transactional
-    public Owner save(Owner entity) {
-        log.debug("Saving owner: {}", entity.getFirstName());
-        Owner savedOwner = ownerRepository.save(entity);
-        log.info("Owner saved successfully with id: {}", savedOwner.getId());
-        return savedOwner;
+    fun save(entity: Owner): Owner {
+        log.debug("Saving owner: {}", entity.firstName)
+        val savedOwner = ownerRepository!!.save<Owner>(entity)
+        log.info("Owner saved successfully with id: {}", savedOwner.id)
+        return savedOwner
     }
 
     @Transactional
-    @Nullable
-    public Owner update(Long id, Owner entity) {
-        log.debug("Updating owner with id: {}", id);
-        if (!ownerRepository.existsById(id)) {
-            log.warn("Owner not found for update with id: {}", id);
-            return null;
+    fun update(id: Long, entity: Owner): Owner? {
+        log.debug("Updating owner with id: {}", id)
+        if (!ownerRepository!!.existsById(id)) {
+            log.warn("Owner not found for update with id: {}", id)
+            return null
         }
-        entity.setId(id);
-        Owner updatedOwner = ownerRepository.save(entity);
-        log.info("Owner updated successfully with id: {}", updatedOwner.getId());
-        return updatedOwner;
+        entity.id = id
+        val updatedOwner = ownerRepository.save<Owner>(entity)
+        log.info("Owner updated successfully with id: {}", updatedOwner.id)
+        return updatedOwner
     }
 
     @Transactional
-    public void delete(Long id) {
-        log.debug("Deleting owner with id: {}", id);
-        ownerRepository.deleteById(id);
-        log.info("Owner deleted successfully with id: {}", id);
+    fun delete(id: Long) {
+        log.debug("Deleting owner with id: {}", id)
+        ownerRepository!!.deleteById(id)
+        log.info("Owner deleted successfully with id: {}", id)
     }
 }

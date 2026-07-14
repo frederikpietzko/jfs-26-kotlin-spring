@@ -77,7 +77,7 @@ fun OwnerHandler(
                     ownerService
                         .findAll()
                         .toList()
-                        .let { OwnerMappie.mapList(it) }
+                        .let { OwnerMappie.mapList(it as List<Owner>) }
                 )
             }
             POST {
